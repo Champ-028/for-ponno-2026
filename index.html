@@ -105,6 +105,13 @@
 </head>
 <body onload="createHearts()">
 
+    <audio id="bgMusic" loop>
+        <source src="https://files.catbox.moe/ovg6vi.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="photoMusic" loop>
+        <source src="https://files.catbox.moe/uzv4pm.mp3" type="audio/mpeg">
+    </audio>
+
     <div id="page1" class="page active">
         <div class="container">
             <h1>A Surprise for You! 🎁</h1>
@@ -125,7 +132,7 @@
         </div>
         <div class="memory-box">
             <h3>3. Kapish Junction & Moonlight</h3>
-            <p>Remember when we talked about the difficult caste-related things? You cried, and I cried too because I was so scared of losing you. Then the lights went out, leaving only the moonlight. A romantic song started playing, and we shared our kiss this was mandatory cause namal rand perm nala down ayit irikuvayirunu. It remains the best moment of my life.</p>
+            <p>Remember when we talked about the difficult caste-related things? You cried, and I cried too because I was so scared of losing you. Then the lights went out, leaving only the moonlight. A romantic song started playing, and we shared our kiss—this was mandatory cause namal rand perm nala down ayit irikuvayirunu. It remains the best moment of my life.</p>
         </div>
         <div class="memory-box">
             <h3>4. Birthdays</h3>
@@ -169,10 +176,6 @@
         </div>
     </div>
 
-    <audio id="bgMusic" loop>
-        <source src="https://files.catbox.moe/ovg6vi.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
         function createHearts() {
             for (let i = 0; i < 20; i++) {
@@ -187,20 +190,38 @@
         }
 
         function showPage(pageId) {
+            const mainMusic = document.getElementById('bgMusic');
+            const photoMusic = document.getElementById('photoMusic');
+
+            // Hide all pages
             document.querySelectorAll('.page').forEach(p => {
                 p.classList.remove('active');
                 p.style.display = 'none';
             });
+
+            // Show active page
             document.getElementById(pageId).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Handle Audio Switching
+            if (pageId === 'page3') {
+                // Switch to Photo Music
+                mainMusic.pause();
+                photoMusic.play().catch(e => console.log("Audio play blocked by browser"));
+            } else {
+                // Switch back to Main Music (if not already playing)
+                photoMusic.pause();
+                // We only play if startSequence has already been triggered
+                if(mainMusic.paused && pageId !== 'page1') {
+                    mainMusic.play().catch(e => console.log("Audio play blocked"));
+                }
+            }
         }
 
-        // STEP 1 & 2 LOGIC
         async function startSequence() {
             document.getElementById('bgMusic').play();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
 
-            // 1. Happy New Year Ponno!
             await Swal.fire({
                 title: '🎉 Happy New Year Ponno! 🎉',
                 text: '365 new days are coming, and I want to spend every single one of them making you feel as special as you make me feel!',
@@ -209,7 +230,6 @@
                 confirmButtonColor: '#ff4d6d'
             });
 
-            // 2. A Note for You
             await Swal.fire({
                 title: 'A Note for You',
                 text: 'To my ponno. Thank you for coming to my life as a friend first then as my love. You have supported me at every down phase. You have trusted me. You have scolded me when i was wrong. You have done many things to make me happy and I LOVE YOU',
@@ -219,7 +239,6 @@
                 confirmButtonColor: '#ff4d6d'
             });
 
-            // 3. One more thing... (Leads to Memory Page)
             await Swal.fire({
                 title: 'One more thing...',
                 text: 'I want to show you our journey.',
@@ -232,7 +251,6 @@
             showPage('page2');
         }
 
-        // STEP 5 & 6 LOGIC
         async function triggerIgnite() {
             const { isConfirmed } = await Swal.fire({
                 title: 'Ready for 2026?',
@@ -245,7 +263,6 @@
             });
 
             if (isConfirmed) {
-                // Ignite the sparks effect
                 var duration = 3 * 1000;
                 var end = Date.now() + duration;
                 (function frame() {
@@ -254,7 +271,6 @@
                     if (Date.now() < end) requestAnimationFrame(frame);
                 }());
 
-                // STEP 6: Closing 2025 on a good note...
                 let timerInterval;
                 Swal.fire({
                     title: 'Closing 2025 on a good note...',
@@ -274,7 +290,6 @@
                     },
                     willClose: () => { clearInterval(timerInterval); }
                 }).then(() => {
-                    // Finally, show the Baby Pink Page
                     showPage('finalPage');
                     confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
                 });
